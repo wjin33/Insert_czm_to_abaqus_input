@@ -3,7 +3,7 @@
 ## Additional package goes here
 import sys
 from Mesh import *
-from tkinter import *
+# from tkinter import *
 import time
 
 ##########################################################
@@ -24,10 +24,10 @@ ENUM = ["ALL", "part", "Along crack"]
 attempt = 5
 while True and attempt > 0: 
         try:
-            filename = input("File Name: ")
-            outputName = input("Output Name:")
-            cohElementSet = input("CZE set:")
-            CZMMaterialName = input ("CZM material name:")
+            filename = raw_input("File Name: ")
+            outputName = raw_input("Output Name:")
+            cohElementSet = raw_input("CZE set:")
+            CZMMaterialName = raw_input ("CZM material name:")
             for i in range(0, len(ENUM)):
                     print(str(i+1) + ". " + ENUM[i])
         
@@ -240,7 +240,7 @@ elif (Mode == 2):
                         
         mesh.cohesiveFunction2()
 elif (Mode == 3):
-        nodeSetInfo = mesh.nodeSet[2][cohElementSet]
+        nodeSetInfo = mesh.nodeSet[2][cohElementSet.split("\\")[0]]
         aList = []
         if "generate" in nodeSetInfo:
                 start, stop, step = nodeSetInfo.split()[-3:]

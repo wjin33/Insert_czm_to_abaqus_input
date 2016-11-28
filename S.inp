@@ -2846,7 +2846,7 @@
 12, 2750, 2747, 366, 365
 13, 2747, 2741, 367, 366
 14, 2741, 2742, 368, 367
-15, 33, 3, 34, 368
+15, 2742, 3, 2743, 368
 16, 67, 355, 369, 66
 17, 355, 356, 370, 369
 18, 356, 357, 371, 370
@@ -3026,7 +3026,7 @@
 192, 669, 587, 589, 672
 193, 114, 523, 524, 113
 194, 1036, 505, 1043, 1037
-195, 501, 1036, 3, 33
+195, 501, 1036, 2740, 33
 196, 610, 597, 689, 691
 197, 598, 527, 526, 609
 198, 597, 598, 688, 689
@@ -3697,9 +3697,9 @@
 863, 2755, 1303, 1302, 2758
 864, 2752, 1301, 1303, 2755
 865, 1321, 1302, 1303, 1753
-866, 12, 1300, 1220, 162
+866, 2764, 1300, 1220, 2768
 867, 2745, 1156, 1304, 2749
-868, 1748, 1211, 169, 3
+868, 1748, 1211, 2746, 3
 869, 94, 1230, 1231, 95
 870, 1417, 1380, 1157, 1231
 871, 1329, 1332, 1230, 1233
@@ -4617,7 +4617,7 @@
 1783, 1976, 1910, 1907, 1979
 1784, 1978, 2101, 1980, 1905
 1785, 2007, 1940, 1939, 2025
-1786, 2291, 12, 292, 1912
+1786, 2291, 12, 2769, 1912
 1787, 2011, 1945, 1946, 2017
 1788, 1946, 1945, 2826, 2827
 1789, 2008, 2078, 2069, 1952
@@ -4661,7 +4661,7 @@
 1827, 1899, 1969, 2030, 1961
 1828, 2029, 1960, 1897, 1963
 1829, 2805, 2807, 1956, 2019
-1830, 2018, 2292, 16, 249
+1830, 2018, 2292, 16, 2818
 1831, 2015, 1948, 1950, 2013
 1832, 2091, 2089, 2033, 2032
 1833, 2024, 2021, 1959, 1955
@@ -4980,7 +4980,7 @@
 2146, 2287, 2286, 42, 41
 2147, 35, 34, 2288, 2289
 2148, 2290, 167, 166, 1942
-2149, 2292, 1957, 309, 16
+2149, 2292, 1957, 2817, 16
 2150, 2295, 1921, 1920, 1989
 2151, 2296, 2039, 1974, 1982
 2152, 1996, 2038, 2301, 2306
@@ -4998,7 +4998,7 @@
 2164, 2375, 2434, 2437, 2374
 2165, 2376, 240, 239, 2422
 2166, 2420, 2417, 2361, 2360
-2167, 2372, 249, 16, 2342
+2167, 2372, 249, 2816, 2342
 2168, 251, 2367, 2363, 252
 2169, 2426, 2424, 2363, 2367
 2170, 345, 346, 2333, 2334
@@ -5412,7 +5412,7 @@
 2578, 2776, 2697, 2695, 2771
 2579, 2693, 2695, 293, 292
 2580, 2771, 2695, 2693, 2772
-2581, 326, 2693, 292, 12
+2581, 2772, 2693, 292, 12
 2582, 321, 320, 2681, 2700
 2583, 2685, 2684, 317, 316
 2584, 2704, 2703, 2678, 2676
@@ -5555,24 +5555,16 @@
 2720, 259, 260, 2829, 2828
 2721, 260, 261, 2830, 2829
 2722, 17, 261, 2830, 2831
-2723, 3, 2742, 33, 3
-2724, 3, 2743, 34, 3
-2725, 3, 2746, 169, 3
-2726, 12, 2768, 162, 12
-2727, 12, 2769, 292, 12
-2728, 12, 326, 2772, 12
-2729, 16, 2818, 249, 16
-2730, 16, 2817, 309, 16
 *Nset, nset=Set-1, generate
     1,  2707,     1
 *Elset, elset=Set-1, generate
     1,  2605,     1
 *Elset, elset=CZE, generate
-2606, 2730,  1
+2606, 2722,  1
 ** Section: Section-1
 *Solid Section, elset=Set-1, material=Elastic
 ** Section: cohe
-*Cohesive Section, elset=CZE, material=concrete, response=TRACTION SEPARATION
+*Cohesive Section, elset=CZE, material=, response=TRACTION SEPARATION
 1,
 *End Part
 **  
@@ -11327,50 +11319,6 @@ Element2161, S2
 Element1696, S3
 *Surface, type=ELEMENT, name=surface234
 Element2219, S2
-*Surface, type=ELEMENT, name=surface235
-Element15, S1
-*Surface, type=ELEMENT, name=surface236
-Element195, S3
-*Surface, type=ELEMENT, name=surface237
-Element15, S2
-*Surface, type=ELEMENT, name=surface238
-Element1736, S1
-*Surface, type=ELEMENT, name=surface239
-Element786, S1
-*Surface, type=ELEMENT, name=surface240
-Element861, S3
-*Surface, type=ELEMENT, name=surface241
-Element868, S3
-*Surface, type=ELEMENT, name=surface242
-Element1736, S2
-*Surface, type=ELEMENT, name=surface243
-Element866, S4
-*Surface, type=ELEMENT, name=surface244
-Element2177, S2
-*Surface, type=ELEMENT, name=surface245
-Element1150, S2
-*Surface, type=ELEMENT, name=surface246
-Element1811, S2
-*Surface, type=ELEMENT, name=surface247
-Element1786, S2
-*Surface, type=ELEMENT, name=surface248
-Element2581, S3
-*Surface, type=ELEMENT, name=surface249
-Element2177, S1
-*Surface, type=ELEMENT, name=surface250
-Element2581, S4
-*Surface, type=ELEMENT, name=surface251
-Element1830, S3
-*Surface, type=ELEMENT, name=surface252
-Element2167, S2
-*Surface, type=ELEMENT, name=surface253
-Element2149, S3
-*Surface, type=ELEMENT, name=surface254
-Element2568, S2
-*Surface, type=ELEMENT, name=surface255
-Element2254, S2
-*Surface, type=ELEMENT, name=surface256
-Element2568, S1
 *End Assembly
 ** 
 ** MATERIALS

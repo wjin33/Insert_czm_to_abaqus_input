@@ -18,7 +18,6 @@ class Mesh:
         elementsCopy = None
         elementSet = None
         edgeTracker = None
-        edges = None
         edgeSet = None
 
         ##
@@ -238,14 +237,14 @@ class Mesh:
             change = set()
             unchange = set()
             # cycle = 0
-
-            ## Update single craks
             while fringe:
+
                 # cycle += 1
                 newFringe = []
                 for parent in fringe:
-                    visited.add(parent)
+                    
                     parentNode = self.nodeTree[parent]
+
                     ## Update mechanics
                     for childNode in parentNode.neighbours:
                         if childNode.ID in visited:
@@ -254,8 +253,10 @@ class Mesh:
                             if childNode.number == 1:
                                 continue
                             newFringe += [childNode.ID]
+
                     if parentNode.number > 2:
                         joinList += [parent]
+                        visited.add(parent)
                     ## Edge point 
                     elif parentNode.number == 1:
                         childNode = parentNode.neighbours[0]
@@ -263,6 +264,9 @@ class Mesh:
                             edge = childNode.ID, parent
                         else:
                             edge = parent, childNode.ID
+                        
+
+
                         surf1, surf2 = self.edgeTracker[edge]
                         element1 = list(self.elements[int(surf1[0])])
                         element2 = list(self.elements[int(surf2[0])])
@@ -273,6 +277,8 @@ class Mesh:
                         if len(change) == 0:
                             change = change|set(element1) - set(edge)
                             unchange = unchange|set(element2) - set(edge)
+                            
+
                         # Test memebership
                         if self.isInside(element1, change):
                             change = change|set(element1) - set(edge)
@@ -282,26 +288,36 @@ class Mesh:
                             change = change|set(element2) - set(edge)
                             element2 = self.updateElement(element2, nodeA, newNodeA, nodeB, newNodeB)
                             self.elements[int(surf2[0])] = tuple(element2)
+
+                        
                         ## Surface
                         self.surfList.append(["surface"+str(self.surfaceCount), surf1[0], surf1[1]])
                         self.surfList.append(["surface"+str(self.surfaceCount+1), surf2[0], surf2[1]])
                         ## CP
                         self.CPList.append (("surface"+str(self.surfaceCount), "surface"+str(self.surfaceCount+1)))
                         self.surfaceCount += 2  
-                        ## CZE
+
                         self.CZE.append([str(nodeA), str(nodeB), str(newNodeB), str(newNodeA)])
+
+                        visited.add(childNode.ID)
+
+                    ## 
                     elif parentNode.number == 2:
                         ## since there are only two neightbours and one doesn't work
                         ## safe to assume 
+
                         if parentNode.neighbours[0].ID in visited:
                             childNode = parentNode.neighbours[1]
                         else:
                             childNode = parentNode.neighbours[0]
+
+                        
                         ## establish edge
                         if parent > childNode.ID:
                             edge = childNode.ID, parent
                         else:
                             edge = parent, childNode.ID
+
                         ## two scenarios 
                         ## either it's the start of a new crack
                         ## or it's in the middle of the crack
@@ -312,15 +328,38 @@ class Mesh:
                         element2 = list(self.elements[int(surf2[0])])
                         nodeA = edge[0]
                         nodeB = edge[1]
-                        if self.nodeTracker[nodeA] != []:
+
+
+
+                        # if (nodeA in visited and nodeB in visited):
+                        #     continue
+                        # elif nodeA in visited:
+                        #     newNodeA = self.nodeTracker[nodeA][-1]
+                        #     newNodeB = self.updateNode(nodeB)
+                        # elif nodeB in visited:
+                        #     newNodeA = self.updateNode(nodeA)
+                        #     newNodeB = self.nodeTracker[nodeB][-1]
+                        # else:
+                        #     newNodeA = self.updateNode(nodeA)
+                        #     newNodeB = self.updateNode(nodeB)
+                        if nodeA in visited and nodeB in visited:
                             newNodeA = self.nodeTracker[nodeA][-1]
-                        else:
-                            newNodeA = self.updateNode(nodeA)
-                        if self.nodeTracker[nodeB] != []:
                             newNodeB = self.nodeTracker[nodeB][-1]
-                        else:
+                        elif nodeA in visited and nodeB not in visited:
+                            newNodeA = self.nodeTracker[nodeA][-1]
                             newNodeB = self.updateNode(nodeB)
-                        if self.isInside(element1, change) or not self.isInside(element1, unchange):
+                        elif nodeA not in visited and nodeB in visited:
+                            newNodeA = self.updateNode(nodeA)
+                            print nodeB, visited
+                            
+                            newNodeB = self.nodeTracker[nodeB][-1]
+                        # else:
+                        #     newNodeA = self.updateNode(nodeA)
+                        #     newNodeB = self.updateNode(nodeB)
+
+
+
+                        if self.isInside(element1, change):
                             change = change|set(element1) - set(edge)
                             unchange = unchange|set(element2) - set(edge)
                             element1 = self.updateElement(element1, nodeA, newNodeA, nodeB, newNodeB)
@@ -330,24 +369,29 @@ class Mesh:
                             uncahnge = unchange|set(element2) - set(edge)
                             element2 = self.updateElement(element2, nodeA, newNodeA, nodeB, newNodeB)
                             self.elements[int(surf2[0])] = tuple(element2)
+                        
                         ## Surface
                         self.surfList.append(["surface"+str(self.surfaceCount), surf1[0], surf1[1]])
                         self.surfList.append(["surface"+str(self.surfaceCount+1), surf2[0], surf2[1]])
                         ## CP
                         self.CPList.append (("surface"+str(self.surfaceCount), "surface"+str(self.surfaceCount+1)))
                         self.surfaceCount += 2  
-                        ## CZE
+
                         self.CZE.append([str(nodeA), str(nodeB), str(newNodeB), str(newNodeA)])
                         visited.add(childNode.ID)
+                    ## update visited here to make sure no revisit
+                    
                 if len(newFringe) != 0: 
                     fringe = newFringe
                 else:
                     fringe = None
 
-            ## Join single craks together
+
+            
             for node in joinList:
-                print node
-                passNode = None
+                check = True
+                base1 = None
+                base2 = None
                 for neighbour in self.nodeTree[node].neighbours:
                     ID = neighbour.ID
                     if node > ID:
@@ -358,86 +402,31 @@ class Mesh:
                     element1 = list(self.elements[int(surf1[0])])
                     element2 = list(self.elements[int(surf2[0])])
                     if len(set(element1).intersection(set(element2))) == 0:
-                        passNode = ID
+                        base1 = element1
+                        base2 = element2
                         break
-                for neighbour in self.nodeTree[node].neighbours:
-                    ID = neighbour.ID
-                    if ID == passNode:
-                        continue
 
-                    if node > ID:
-                        edge = ID, node
-                    else:
-                        edge = node, ID
-                    
-                    surf1, surf2 = self.edgeTracker[edge]
-                     
-                    element1 = list(self.elements[int(surf1[0])])
-                    element2 = list(self.elements[int(surf2[0])])
-                    for edge in self.CPE4Edges(element1):
-                        if edge in self.edges or edge not in self.edgeTracker.keys():
-                            continue
-                        surf3, surf4 = self.edgeTracker[edge]
-                        element3 = list(self.elements[int(surf3[0])])
-                        element4 = list(self.elements[int(surf4[0])])
-                        if len(set(element3).intersection(set(element4))) == 1:
-                            newNode = (set(edge) - set(element3).intersection(set(element4))).pop()
-                            # print newNode
-                            if newNode in element3:
-                                print element3
-                                element3[element3.index(newNode)] = self.nodeTracker[newNode][-1]
-                                self.elements[int(surf3[0])] = tuple(element3)
-                                print element3, element4
-                            else:
-                                print element4
-                                element4[element4.index(newNode)] = self.nodeTracker[newNode][-1]
-                                self.elements[int(surf4[0])] = tuple(element4)
-                                print element4, element3
-                            # print self.nodeTracker[newNode][-1]
-
-                    for edge in self.CPE4Edges(element2):
-                        if edge in self.edges or edge not in self.edgeTracker.keys():
-                            continue
-                        surf3, surf4 = self.edgeTracker[edge]
-                        element3 = list(self.elements[int(surf3[0])])
-                        element4 = list(self.elements[int(surf4[0])])
-                        if len(set(element3).intersection(set(element4))) == 1:
-                            newNode = (set(edge) - set(element3).intersection(set(element4))).pop()
-                            # print newNode
-                            if newNode in element3:
-                                print element3
-                                element3[element3.index(newNode)] = self.nodeTracker[newNode][-1]
-                                self.elements[int(surf3[0])] = tuple(element3)
-                                print element3, element4
-                            else:
-                                print element4
-                                element4[element4.index(newNode)] = self.nodeTracker[newNode][-1]
-                                self.elements[int(surf4[0])] = tuple(element4)
-                                print element4, element3
-
-            print("\n")
-            for node in joinList:
                 for neighbour in self.nodeTree[node].neighbours:
                     ID = neighbour.ID
                     if node > ID:
                         edge = ID, node
                     else:
                         edge = node, ID
+
                     surf1, surf2 = self.edgeTracker[edge]
+                    ## Surface
+                    self.surfList.append(["surface"+str(self.surfaceCount), surf1[0], surf1[1]])
+                    self.surfList.append(["surface"+str(self.surfaceCount+1), surf2[0], surf2[1]])
+                    ## CP
+                    self.CPList.append (("surface"+str(self.surfaceCount), "surface"+str(self.surfaceCount+1)))
+                    self.surfaceCount += 2  
                     element1 = list(self.elements[int(surf1[0])])
                     element2 = list(self.elements[int(surf2[0])])
-            #         # ## Surface
-            #         # self.surfList.append(["surface"+str(self.surfaceCount), surf1[0], surf1[1]])
-            #         # self.surfList.append(["surface"+str(self.surfaceCount+1), surf2[0], surf2[1]])
-            #         # ## CP
-            #         # self.CPList.append (("surface"+str(self.surfaceCount), "surface"+str(self.surfaceCount+1)))
-            #         # self.surfaceCount += 2 
-            #         print node
-            #         if set(element1).intersection(set(element2)):
-            #             print "intersection", element1, element2
-            #         else:
-            #             print "NOT intersect", element1, element2 
 
+                    if len(set(element1).intersection(set(element2))) == 0:
+                        if check:
+                            check = False
+                            continue   
 
                     if self.nodeTree[ID].neighbours[0].ID == node:
                         child = self.nodeTree[ID].neighbours[1].ID
@@ -467,17 +456,6 @@ class Mesh:
                                 continue
                             if element1[i] in self.nodeTracker.keys() and self.nodeTracker[element1[i]] != []:
                                 element1[i]  = self.nodeTracker[element1[i]][-1]
-
-                
-
-
-
-
-
-
-
-
-
 
                 
                     # print element1, element2
@@ -510,33 +488,33 @@ class Mesh:
                     # self.elements[int(surf2[0])] = tuple(element2)
 
 
-                    # nodeA, nodeB = edge
-                    # ## element1
-                    # if nodeA in element1:
-                    #     nodeC = nodeA
-                    # else:
-                    #     for i in element1:
-                    #         if i in self.nodeTracker[nodeA]:
-                    #             nodeC = i
-                    # if nodeB in element1:
-                    #     nodeD = nodeB
-                    # else:
-                    #     for i in element1:
-                    #         if i in self.nodeTracker[nodeB]:
-                    #             nodeD = i
-                    # #element2
-                    # if nodeA in element2:
-                    #     nodeE = nodeA
-                    # else:
-                    #     for i in element2:
-                    #         if i in self.nodeTracker[nodeA]:
-                    #             nodeE = i
-                    # if nodeB in element2:
-                    #     nodeF = nodeB
-                    # else:
-                    #     for i in element2:
-                    #         if i in self.nodeTracker[nodeB]:
-                    #             nodeF = i
+                    nodeA, nodeB = edge
+                    ## element1
+                    if nodeA in element1:
+                        nodeC = nodeA
+                    else:
+                        for i in element1:
+                            if i in self.nodeTracker[nodeA]:
+                                nodeC = i
+                    if nodeB in element1:
+                        nodeD = nodeB
+                    else:
+                        for i in element1:
+                            if i in self.nodeTracker[nodeB]:
+                                nodeD = i
+                    #element2
+                    if nodeA in element2:
+                        nodeE = nodeA
+                    else:
+                        for i in element2:
+                            if i in self.nodeTracker[nodeA]:
+                                nodeE = i
+                    if nodeB in element2:
+                        nodeF = nodeB
+                    else:
+                        for i in element2:
+                            if i in self.nodeTracker[nodeB]:
+                                nodeF = i
                     # for i in element1:
                     #     if i in self.nodeTracker.keys() and len(self.nodeTracker[i]) == 0:
                     #         continue
@@ -545,7 +523,7 @@ class Mesh:
                     #     if i in self.nodeTracker.keys() and len(self.nodeTracker[i]) == 0:
                     #         continue
                     #     CZE += [str(i)]
-                    # self.CZE.append([str(nodeC), str(nodeD), str(nodeF), str(nodeE)])
+                    self.CZE.append([str(nodeC), str(nodeD), str(nodeF), str(nodeE)])
                     # print ([str(nodeC), str(nodeD), str(nodeF), str(nodeE)])
                     # update all the nodes within the element to its latest.  
                     # Element1 First
@@ -737,7 +715,6 @@ class Mesh:
 
             currentNode = int(aList.pop(0))
             self.nodeTree = dict()  ## this set keep track of Graphnodes
-            self.edges = set()
             root = self.makeGraphNode(currentNode)
             visited = set()
 
@@ -754,7 +731,6 @@ class Mesh:
                         continue
                     if edge in self.edgeTracker:
                         visited.add(edge)
-                        self.edges.add(edge)
                         graphNodeA = self.makeGraphNode(currentNode)
                         graphNodeB = self.makeGraphNode(node)
 
@@ -762,6 +738,9 @@ class Mesh:
                         graphNodeB.addNeighbour(graphNodeA)
 
                 currentNode = int(aList.pop(0))
+                        
+                        
+
 
         def makeGraphNode(self, ID):
             if ID not in self.nodeTree.keys():
@@ -780,49 +759,50 @@ class Mesh:
                 element[element.index(nodeB)] = newNodeB
             except:
                 pass
+            
             return element
 
-        def makeTree(self, aList):
-            self.nodeTree = dict()
-            currentNode = int(aList.pop(0))
-            visited = set()
-            root = treeNode(currentNode)
-            self.nodeTree[currentNode] = root
-            fringe = [currentNode]
+        # def makeTree(self, aList):
+        #     self.nodeTree = dict()
+        #     currentNode = int(aList.pop(0))
+        #     visited = set()
+        #     root = treeNode(currentNode)
+        #     self.nodeTree[currentNode] = root
+        #     fringe = [currentNode]
 
-            while (fringe) :
-                newFringe = []
-                for currentNode in fringe:
-                    for node in aList:
-                        node = int(node)
-                        if node > currentNode:
-                            edge = (currentNode, node)
-                        else:
-                            edge = (node, currentNode)
+        #     while (fringe) :
+        #         newFringe = []
+        #         for currentNode in fringe:
+        #             for node in aList:
+        #                 node = int(node)
+        #                 if node > currentNode:
+        #                     edge = (currentNode, node)
+        #                 else:
+        #                     edge = (node, currentNode)
 
-                        if edge in visited:
-                            continue
+        #                 if edge in visited:
+        #                     continue
 
-                        if edge in self.edgeTracker.keys():
-                            newFringe += [node]
-                            visited.add(edge)
-                            nodeA = self.makeTreeNode(currentNode)
-                            nodeB = self.makeTreeNode(node)
-                            nodeA.addChild(nodeB)
-                            nodeB.addParent(nodeA)
+        #                 if edge in self.edgeTracker.keys():
+        #                     newFringe += [node]
+        #                     visited.add(edge)
+        #                     nodeA = self.makeTreeNode(currentNode)
+        #                     nodeB = self.makeTreeNode(node)
+        #                     nodeA.addChild(nodeB)
+        #                     nodeB.addParent(nodeA)
                 
-                if len(newFringe) == 0:
-                    fringe = None
-                else:
-                    fringe = newFringe
+        #         if len(newFringe) == 0:
+        #             fringe = None
+        #         else:
+        #             fringe = newFringe
 
-        def makeTreeNode(self, node):
-            if node in self.nodeTree.keys():
-                return self.nodeTree[node]
-            else:
-                treenode = treeNode(node)
-                self.nodeTree[node] = treenode
-                return self.nodeTree[node]
+        # def makeTreeNode(self, node):
+        #     if node in self.nodeTree.keys():
+        #         return self.nodeTree[node]
+        #     else:
+        #         treenode = treeNode(node)
+        #         self.nodeTree[node] = treenode
+        #         return self.nodeTree[node]
 
 
             #             if edge in self.edgeTracker: 
