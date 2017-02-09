@@ -244,6 +244,7 @@ class Mesh:
                 # cycle += 1
                 newFringe = []
                 for parent in fringe:
+
                     visited.add(parent)
                     parentNode = self.nodeTree[parent]
                     ## Update mechanics
@@ -345,8 +346,9 @@ class Mesh:
                     fringe = None
 
             ## Join single craks together
+            ## update according to neighbours
             for node in joinList:
-                print node
+                # print node
                 passNode = None
                 for neighbour in self.nodeTree[node].neighbours:
                     ID = neighbour.ID
@@ -360,6 +362,7 @@ class Mesh:
                     if len(set(element1).intersection(set(element2))) == 0:
                         passNode = ID
                         break
+
                 for neighbour in self.nodeTree[node].neighbours:
                     ID = neighbour.ID
                     if ID == passNode:
@@ -384,15 +387,15 @@ class Mesh:
                             newNode = (set(edge) - set(element3).intersection(set(element4))).pop()
                             # print newNode
                             if newNode in element3:
-                                print element3
+                                # print element3
                                 element3[element3.index(newNode)] = self.nodeTracker[newNode][-1]
                                 self.elements[int(surf3[0])] = tuple(element3)
-                                print element3, element4
+                                # print element3, element4
                             else:
-                                print element4
+                                # print element4
                                 element4[element4.index(newNode)] = self.nodeTracker[newNode][-1]
                                 self.elements[int(surf4[0])] = tuple(element4)
-                                print element4, element3
+                                # print element4, element3
                             # print self.nodeTracker[newNode][-1]
 
                     for edge in self.CPE4Edges(element2):
@@ -405,18 +408,20 @@ class Mesh:
                             newNode = (set(edge) - set(element3).intersection(set(element4))).pop()
                             # print newNode
                             if newNode in element3:
-                                print element3
+                                # print element3
                                 element3[element3.index(newNode)] = self.nodeTracker[newNode][-1]
                                 self.elements[int(surf3[0])] = tuple(element3)
-                                print element3, element4
+                                # print element3, element4
                             else:
-                                print element4
+                                # print element4
                                 element4[element4.index(newNode)] = self.nodeTracker[newNode][-1]
                                 self.elements[int(surf4[0])] = tuple(element4)
-                                print element4, element3
+                                # print element4, element3
 
             print("\n")
+            ## update nodes for individual elements
             for node in joinList:
+                # print node
                 for neighbour in self.nodeTree[node].neighbours:
                     ID = neighbour.ID
                     if node > ID:
@@ -424,8 +429,17 @@ class Mesh:
                     else:
                         edge = node, ID
                     surf1, surf2 = self.edgeTracker[edge]
+
                     element1 = list(self.elements[int(surf1[0])])
                     element2 = list(self.elements[int(surf2[0])])
+                    if 3 in element1:
+                        print 1
+                        print element1
+
+                    if 3 in element2:
+                        print 2
+                        print element2
+
             #         # ## Surface
             #         # self.surfList.append(["surface"+str(self.surfaceCount), surf1[0], surf1[1]])
             #         # self.surfList.append(["surface"+str(self.surfaceCount+1), surf2[0], surf2[1]])
