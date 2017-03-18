@@ -1,4 +1,5 @@
-## Author: Jianming Zeng
+"""Author: Jianming Zeng"""
+
 from node import *
 
 class element:
@@ -34,10 +35,19 @@ class element:
 		self.back4 = h
 		self.constructSurfaces()
 
+	"""
+	Contructing all six surfaces. For surfaces detail information please check abaqus manual for
+	cohesive zone element
+	"""
 	def constructSurfaces(self):
 		pass
 
 
+	"""
+	Helper function to get all the surface objects associated with the current element
+	return: 
+		a tuple of surface objects
+	"""
 	def getSurfaces(self):
 		return self.surface1, self.surface2, self.surface3, self.surface4, self.surface5, self.surface6 
 

@@ -1,4 +1,4 @@
-## Author: Jianming Zeng
+"""Author: Jianming Zeng"""
 
 class node:
 	
@@ -15,6 +15,6 @@ class node:
 		self.y = y
 		self.z = z
 	
-	
+
 	def getId(self):
 		return self.id

@@ -1,4 +1,4 @@
-## Author: Jianming Zeng
+"""Author: Jianming Zeng"""
 
 from node import *
 from element import *
@@ -99,9 +99,12 @@ class graph:
 		self.mySurfaceMap.insert(surfaces)
 
 
+
 	def getElementByID(self, id):
 		return self.elementMap[id]
 
+
+	def homogeneous(self):
 
 
 

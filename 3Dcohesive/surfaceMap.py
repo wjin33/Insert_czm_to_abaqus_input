@@ -1,4 +1,4 @@
-##Author: Jianming Zeng
+"""Author: Jianming Zeng"""
 
 class surfaceMap:
 	

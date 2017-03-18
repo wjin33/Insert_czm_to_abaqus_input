@@ -1,6 +1,5 @@
-## Author: Jianming Zeng
+"""Author: Jianming Zeng"""
 from node import *
-
 
 class surface:
 
@@ -19,5 +18,13 @@ class surface:
 		self.nodeC = c
 		self.nodeD = d
 
-	def getIdentity(self, ):
+	"""
+	Identity is NOT the surface number of the surface. This Identity is a tuple of nodes' 
+	ID which is used for comparison between surface objects. It's sorted in an accending 
+	order. 
+
+	return:
+		a tuple of ndoes' ID in accending order 
+	"""
+	def getIdentity(self):
 		return [nodeA.getId(), nodeB.getId(), nodeC.getId(), nodeD.getId()].sort()
