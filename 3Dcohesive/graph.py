@@ -1,12 +1,11 @@
 """Author: Jianming Zeng"""
 
 from node import *
-from element import *
+from Element import *
 from surface import *
 from surfaceMap import *
 
 class graph: 
-
 
 	## Local variables and data strcuctures
 	name = None
@@ -15,8 +14,15 @@ class graph:
 	nodes = 0
 	elementMap = dict()
 	elements = 0
-	surfaceMap = None
-	
+	mySurfaceMap = None
+
+	surfList = list()
+	surfaceCount = 1
+	CPList = list()
+	cohList = list()
+
+	## Tracker update 
+	nodeTracker = dict()
 
 	"""
 	Initialize an empty skeleton graph
@@ -79,12 +85,12 @@ class graph:
 		g = self.getNodeByID(int(g.split(",")[0].strip()))
 		h = self.getNodeByID(int(h.split(",")[0].strip()))
 
-		newElement = element(id, a, b, c, d, e, f, g, h)
+		newElement = Element(id, a, b, c, d, e, f, g, h)
 		self.elementMap[id] = newElement
 		self.elements += 1
-
 		self.insertSurfaces(newElement)
-
+		# print "current Element ID " + str(id)
+		# print newElement.nodes.keys()
 
 	"""
 	This function pairs every surface which is shared by two elements.
@@ -94,8 +100,8 @@ class graph:
 	Argument:
 		element: new element object 
 	"""
-	def insertSurfaces(self, element):
-		surfaces = element.getSurfaces()
+	def insertSurfaces(self, myElement):
+		surfaces = myElement.getSurfaces()
 		self.mySurfaceMap.insert(surfaces)
 
 
@@ -104,7 +110,60 @@ class graph:
 		return self.elementMap[id]
 
 
-	def homogeneous(self):
+	def getSurfaceMap(self, ):
+		return self.mySurfaceMap
+
+	def homogeneous(self, start, stop, step):
+		hashMap = self.mySurfaceMap.getHashMap()
+		tacker = set()
+		for key in hashMap:
+			if len(hashMap[key]) == 2:
+				myList = [] 
+				surface1, surface2 = hashMap[key]
+		
+				element1 = self.getElementByID(surface1[5])
+				surfaceNumber1 = surface1[0]
+				nodes1 = (self.getNodeByID(surface1[1]),
+						self.getNodeByID(surface1[2]),
+						self.getNodeByID(surface1[3]),
+						self.getNodeByID(surface1[4]),
+					)
+				
+				element2 = self.getElementByID(surface2[5])
+				surfaceNumber2 = surface2[0]
+				nodes2 = (self.getNodeByID(surface2[1]),
+						self.getNodeByID(surface2[2]),
+						self.getNodeByID(surface2[3]),
+						self.getNodeByID(surface2[4]),
+					)
+
+				## update node directly 
+				myList += self.updateNode(nodes1, element1)
+				myList += self.updateNode(nodes2, element2)
+
+				self.cohList.append(myList)
+				self.surfList.append(["surface"+str(self.surfaceCount), 
+						str(element1.getId()), "S" + str(surfaceNumber1)])
+				self.surfList.append(["surface"+str(self.surfaceCount+1), 
+						str(element2.getId()), "S" + str(surfaceNumber2)])
+				self.CPList.append (("surface"+str(self.surfaceCount), "surface"+str(self.surfaceCount+1)))
+				self.surfaceCount+=2
+                
 
 
+	def updateNode(self, nodes, element):
+		myList = []
+		for current in nodes:
+			if current.getId() in self.nodeTracker:	
+				self.nodes += 1
+				id = current.getId()
+				current = node(self.nodes, current.x, current.y, current.z)
+				self.nodeMap[self.nodes] = current
+				element.updateNode(id, current)
+			else:
+				self.nodeTracker[current.getId()] = []
+
+
+			myList.append(current.getId())
+		return myList
 
